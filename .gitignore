@@ -1,0 +1,4 @@
+*.*
+!.gitignore
+!map/*.c
+!map/*.h
