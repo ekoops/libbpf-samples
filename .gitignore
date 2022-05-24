@@ -1,5 +1,6 @@
-*.*
-!.gitignore
-!map/*.c
-!map/*.h
-!map/*.sh
+*
+!*/
+uncompleted
+!**/*.c
+!**/*.h
+!**/*.a

@@ -27,22 +27,22 @@ int handle_tracepoint(void *ctx) {
     // if the value is not present, add it
     // if the value is present, delete it
     if (!value) {
-        bpf_printk("failed to lookup for key(%d) in map_kern. Trying to insert a new value...\n", key);
+        bpf_printk("failed to lookup for key(%d) in eBPF map \'map_kern\'. Trying to insert a new value...\n", key);
         int new_value = 5;
         result = bpf_map_update_elem(&map_kern, &key, &new_value, BPF_NOEXIST);
         if (result < 0) {
-            bpf_printk("failed to insert new value(%d) for key(%d) in map_kern", new_value, key);
+            bpf_printk("failed to insert new value(%d) for key(%d) in eBPF map \'map_kern\'", new_value, key);
             return -1;
         }
-        bpf_printk("inserted new value(%d) for key(%d) in map_kern", new_value, key);
+        bpf_printk("inserted new value(%d) for key(%d) in eBPF map \'map_kern\'", new_value, key);
         return 0;
     }
-    bpf_printk("retrieved value(%d) for key(%d) in map_kern. Trying to delete it...\n", *value, key);
+    bpf_printk("retrieved value(%d) for key(%d) in eBPF map \'map_kern\'. Trying to delete it...\n", *value, key);
     result = bpf_map_delete_elem(&map_kern, &key);
     if (result < 0) {
-        bpf_printk("failed to delete value for key(%d) in map_kern\n", key);
+        bpf_printk("failed to delete value for key(%d) in eBPF map \'map_kern\'\n", key);
         return -2;
     }
-    bpf_printk("deleted value for key(%d) in map_kern\n", key);
+    bpf_printk("deleted value for key(%d) in eBPF map \'map_kern\'\n", key);
     return 0;
 }

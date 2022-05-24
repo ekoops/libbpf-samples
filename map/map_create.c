@@ -3,7 +3,7 @@
 #include <unistd.h>
 #include <stdio.h>
 #include "map_create.skel.h"
-#include "common.h"
+#include "../include/common.h"
 
 int main() {
     struct map_create_bpf *skel;

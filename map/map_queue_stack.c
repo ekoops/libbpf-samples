@@ -3,7 +3,7 @@
 #include <unistd.h>
 #include <stdio.h>
 #include "map_queue_stack.skel.h"
-#include "common.h"
+#include "../include/common.h"
 
 int main() {
     struct map_queue_stack_bpf *skel;
