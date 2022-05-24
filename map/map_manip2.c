@@ -1,12 +1,21 @@
 #include <bpf/bpf.h>
+#include <bpf/libbpf.h>
 #include <stdio.h>
 #include <errno.h>
 
-// clang -g -Wall -lelf -lz map_manip2.c libbpf.a -o map_manip2
+/*
+ * This sample can be compiled using the following command:
+ * clang -g -Wall -lelf -lz map_manip2.c libbpf.a -o map_manip2
+ *
+ * The sample does not use higher level API such as bpf_map__update_elem or bpf_map__lookup_and_delete_elem
+ * since the code is user-space only and I don't know how to retrieve the struct bpf_map pointer associated with
+ * the user-space created map.
+ */
 
 int main() {
-    // retrieving the ebpf map file descriptor
-    int map_fd = bpf_create_map(BPF_MAP_TYPE_HASH, sizeof(int), sizeof(int), 3, BPF_F_NO_PREALLOC);
+    // creating the eBPF map
+    int map_fd = bpf_map_create(BPF_MAP_TYPE_HASH,"map",sizeof(int),
+                                sizeof(int),3,NULL);
     if (map_fd == -1) {
         fprintf(stderr, "failed to create eBPF map: %s\n", strerror(errno));
         return -1;
@@ -17,7 +26,7 @@ int main() {
     for (int i = 0; i < 3; i++) {
         result = bpf_map_update_elem(map_fd, &i, &i, BPF_NOEXIST);
         if (result < 0) {
-            fprintf(stderr,"failed to insert value(%d) for key(%d)\n", i, i);
+            fprintf(stderr, "failed to insert value(%d) for key(%d)\n", i, i);
             return -2;
         }
     }
@@ -29,10 +38,9 @@ int main() {
     int value;
     result = bpf_map_lookup_and_delete_elem(map_fd, &key, &value);
     if (result < 0) {
-        fprintf(stderr,"failed to lookup for key(%d)\n", key);
+        fprintf(stderr, "failed to lookup for key(%d)\n", key);
         return -3;
-    }
-    else {
+    } else {
         printf("retrieved value(%d) for key(%d) and removed from the map\n", value, key);
     }
 

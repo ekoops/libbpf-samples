@@ -23,6 +23,7 @@ int main() {
     // creating eBPF map using bpf call
     union bpf_attr map1 = {
             .map_type = BPF_MAP_TYPE_HASH,
+            .map_name = "map1",
             .key_size = sizeof(int),
             .value_size = sizeof(int),
             .max_entries = 100,
@@ -36,12 +37,13 @@ int main() {
     printf("map1 (syscall) file descriptor: %d\n", map1_fd);
 
     // creating eBPF map using libbpf helper
-    int map2_fd = bpf_create_map(
+    int map2_fd = bpf_map_create(
             BPF_MAP_TYPE_HASH,
+            "map2",
             sizeof(int),
             sizeof(int),
             100,
-            BPF_F_NO_PREALLOC
+            NULL
     );
     if (map2_fd == -1) {
         fprintf(stderr, "failed to create map2 (libbpf): %s\n", strerror(errno));

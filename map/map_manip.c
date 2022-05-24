@@ -27,21 +27,22 @@ int main() {
         goto cleanup;
     }
 
-    // retrieving the ebpf map file descriptor
-    int map_fd = bpf_map__fd(skel->maps.map_user);
-    if (map_fd < 0) {
-        printf("failed to retrieve eBPF map file descriptor\n");
-        return -1;
-    }
+    // retrieving queue from the eBPF skeleton
+    struct bpf_map *map_user = skel->maps.map_user;
+
     int key = 0;
+    size_t key_size = sizeof(key);
     int value;
-    int result = bpf_map_lookup_elem(map_fd, &key, &value);
+    size_t value_size = sizeof(value);
+    int result = bpf_map__lookup_elem(map_user, &key, key_size,
+                                      &value, value_size, 0);
     // if the value is not present, add it
     // if the value is present, delete it
     if (result < 0) {
         printf("failed to lookup for key(%d) in map_user. Trying to insert a new value...\n", key);
         value = 5;
-        result = bpf_map_update_elem(map_fd, &key, &value, BPF_NOEXIST);
+        result = bpf_map__update_elem(map_user, &key, key_size,
+                                      &value, value_size, BPF_NOEXIST);
         if (result < 0) {
             fprintf(stderr,"failed to insert new value(%d) for key(%d) in map_user\n", value, key);
             return -2;
@@ -50,7 +51,7 @@ int main() {
     }
     else {
         printf("retrieved value(%d) for key(%d) in map_user. Trying to delete it...\n", value, key);
-        result = bpf_map_delete_elem(map_fd, &key);
+        result = bpf_map__delete_elem(map_user, &key, key_size, 0);
         if (result < 0) {
             fprintf(stderr,"failed to delete value for key(%d) in map_user\n", key);
             return -3;
@@ -65,7 +66,7 @@ int main() {
         goto cleanup;
     }
 
-    printf("successfully started! Please run `sudo bpftool map dump <map_name>` to inspect the eBPF maps or "
+    printf("successfully started! Please run `sudo bpftool map dump name <map_name>` to inspect the eBPF maps or "
     "`sudo cat /sys/kernel/debug/tracing/trace_pipe` to inspect the eBPF program output\n");
 
     for (;;) {
